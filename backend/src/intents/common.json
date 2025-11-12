@@ -1,0 +1,20 @@
+{
+  "domain": "common",
+  "intents": [
+    {
+      "intent": "greeting",
+      "patterns": ["hi", "hello", "hey", "good morning", "good evening"],
+      "responses": ["Hello! How can I help you today?", "Hi 👋 — how can I assist?"]
+    },
+    {
+      "intent": "help",
+      "patterns": ["help", "what can you do", "show options", "how to use"],
+      "responses": ["I can help with product search, order tracking, ERP queries (leave, invoice), and admin tasks."]
+    },
+    {
+      "intent": "fallback",
+      "patterns": [],
+      "responses": ["Sorry, I didn't understand. Can you rephrase or try one of these: 'track order', 'search product', 'leave balance'?"]
+    }
+  ]
+}

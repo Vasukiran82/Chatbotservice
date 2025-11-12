@@ -1,0 +1,112 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm
+.yarn
+
+# Build outputs
+dist/
+out/
+build/
+.next/
+.nuxt/
+.cache/
+
+# React & React Native
+android/app/build/
+android/build/
+ios/build/
+ios/Pods/
+*.jks
+*.keystore
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+
+# Metro bundler cache
+.metro-cache/
+
+# React Native assets
+assets/assets-*
+assets/*.bundle
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+jspm_packages/
+bower_components/
+
+# TypeScript
+*.tsbuildinfo
+*.tscache
+
+# Coverage
+coverage/
+.nyc_output/
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+*.vscode
+*.code-workspace
+
+# Misc
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.tmp
+*.bak
+*.orig
+*.rej
+*~
+
+# Prisma
+prisma/migrations/*/README.md
+prisma/migrations/*/*.db
+
+# Database files (if any local DBs used during development)
+*.sqlite
+*.db
+
+# Docker
+.dockerignore
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Windows
+$RECYCLE.BIN/
+Desktop.ini
+ehthumbs_vista.db
+Thumbs.db

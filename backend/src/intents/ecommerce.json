@@ -1,0 +1,195 @@
+{
+  "domain": "ecommerce",
+  "intents": [
+    {
+      "intent": "track_order",
+      "patterns": [
+        "track order {order_id}",
+        "track my order {order_id}",
+        "where is my order {order_id}",
+        "order status {order_id}",
+        "where is order {order_id}"
+      ],
+      "entities": ["order_id"],
+      "validationAPI": "/api/ecommerce/validateOrder",
+      "responses": ["Your order {order_id} is currently {status} and will arrive by {delivery_date}."]
+    },
+
+    {
+      "intent": "cancel_order",
+      "patterns": [
+        "cancel order {order_id}",
+        "i want to cancel my order {order_id}",
+        "cancel my order {order_id}",
+        "stop my order {order_id}"
+      ],
+      "entities": ["order_id"],
+      "validationAPI": "/api/ecommerce/cancelOrder",
+      "responses": ["Order {order_id} has been successfully canceled."]
+    },
+
+    {
+      "intent": "return_order",
+      "patterns": [
+        "return order {order_id}",
+        "i want to return my order {order_id}",
+        "initiate return for {order_id}",
+        "how to return order {order_id}"
+      ],
+      "entities": ["order_id"],
+      "validationAPI": "/api/ecommerce/returnOrder",
+      "responses": ["Your return request for order {order_id} has been initiated successfully."]
+    },
+
+    {
+      "intent": "replace_order",
+      "patterns": [
+        "replace order {order_id}",
+        "i want replacement for {order_id}",
+        "replace my item {order_id}",
+        "exchange product {order_id}"
+      ],
+      "entities": ["order_id"],
+      "validationAPI": "/api/ecommerce/replaceOrder",
+      "responses": ["Your replacement request for order {order_id} has been created successfully."]
+    },
+
+    {
+      "intent": "payment_status",
+      "patterns": [
+        "payment status for {order_id}",
+        "has my payment for order {order_id} succeeded",
+        "did payment complete for {order_id}",
+        "check payment {order_id}"
+      ],
+      "entities": ["order_id"],
+      "validationAPI": "/api/ecommerce/checkPayment",
+      "responses": ["The payment for order {order_id} is {payment_status}."]
+    },
+
+    {
+      "intent": "show_offers",
+      "patterns": [
+        "show offers",
+        "show me offers",
+        "current deals",
+        "any discounts",
+        "today's offers",
+        "ongoing sales"
+      ],
+      "responses": ["Today's top deals: 20% off on selected items! Visit the offers page for details."]
+    },
+
+    {
+      "intent": "product_availability",
+      "patterns": [
+        "is {product_name} available",
+        "do you have {product_name}",
+        "check stock for {product_name}",
+        "availability of {product_name}"
+      ],
+      "entities": ["product_name"],
+      "validationAPI": "/api/ecommerce/checkStock",
+      "responses": ["The product {product_name} is currently {availability_status}."]
+    },
+
+    {
+      "intent": "product_details",
+      "patterns": [
+        "tell me about {product_name}",
+        "details of {product_name}",
+        "specifications for {product_name}",
+        "features of {product_name}"
+      ],
+      "entities": ["product_name"],
+      "validationAPI": "/api/ecommerce/productDetails",
+      "responses": ["Here are the details for {product_name}: {product_description}."]
+    },
+
+    {
+      "intent": "order_history",
+      "patterns": [
+        "show my orders",
+        "order history",
+        "past orders",
+        "list of my previous orders"
+      ],
+      "validationAPI": "/api/ecommerce/orderHistory",
+      "responses": ["Here are your recent orders: {orders_list}."]
+    },
+
+    {
+      "intent": "shipping_info",
+      "patterns": [
+        "shipping details for order {order_id}",
+        "where will my order {order_id} be delivered",
+        "delivery address for {order_id}",
+        "shipping status of {order_id}"
+      ],
+      "entities": ["order_id"],
+      "validationAPI": "/api/ecommerce/shippingInfo",
+      "responses": ["Order {order_id} will be delivered to {delivery_address}. Current status: {status}."]
+    },
+
+    {
+      "intent": "update_address",
+      "patterns": [
+        "update my address",
+        "change delivery address for {order_id}",
+        "edit shipping details",
+        "i moved to a new address"
+      ],
+      "entities": ["order_id"],
+      "validationAPI": "/api/ecommerce/updateAddress",
+      "responses": ["Your delivery address for order {order_id} has been updated successfully."]
+    },
+
+    {
+      "intent": "refund_status",
+      "patterns": [
+        "refund status for {order_id}",
+        "check my refund for {order_id}",
+        "has my refund been processed",
+        "when will i get refund for {order_id}"
+      ],
+      "entities": ["order_id"],
+      "validationAPI": "/api/ecommerce/checkRefund",
+      "responses": ["Your refund for order {order_id} is currently {refund_status}."]
+    },
+
+    {
+      "intent": "category_products",
+      "patterns": [
+        "show {category_name} products",
+        "list of {category_name} items",
+        "show me {category_name} collection",
+        "display {category_name} category"
+      ],
+      "entities": ["category_name"],
+      "validationAPI": "/api/ecommerce/categoryProducts",
+      "responses": ["Here are the top products in {category_name} category: {product_list}."]
+    },
+
+    {
+      "intent": "contact_support",
+      "patterns": [
+        "contact support",
+        "customer care number",
+        "help me contact support",
+        "talk to agent"
+      ],
+      "responses": ["You can reach our customer support team at support@shopdemo.com or call +91-9876543210."]
+    },
+
+    {
+      "intent": "payment_methods",
+      "patterns": [
+        "what are the payment options",
+        "available payment methods",
+        "how can i pay",
+        "accepted payment types"
+      ],
+      "responses": ["You can pay via UPI, Credit/Debit Card, Net Banking, or Cash on Delivery."]
+    }
+  ]
+}

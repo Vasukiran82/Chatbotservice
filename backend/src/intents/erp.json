@@ -1,0 +1,18 @@
+{
+  "domain": "erp",
+  "intents": [
+    {
+      "intent": "leave_balance",
+      "patterns": ["show leave balance", "how many leaves left", "leave balance"],
+      "validationAPI": "/api/erp/validateLeave",
+      "responses": ["You have {remaining_leaves} leave days remaining."]
+    },
+    {
+      "intent": "invoice_status",
+      "patterns": ["invoice status {invoice_id}", "status of invoice {invoice_id}", "when is invoice {invoice_id} due"],
+      "entities": ["invoice_id"],
+      "validationAPI": "/api/erp/validateInvoice",
+      "responses": ["Invoice {invoice_id} is {status} and due on {due_date}."]
+    }
+  ]
+}
