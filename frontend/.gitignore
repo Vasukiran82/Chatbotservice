@@ -1,31 +1,43 @@
-./node_modules
-/dist
-/.env
-/.next
-/.vercel
-.DS_Store
-node_modules
-npm-debug.log
-yarn-error.log
-.vscode
-.env
-.idea
-*.log
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
-# Ignore build output
-out/
-.next/
-build/
-# Ignore static files
-/static/
-/public/static/
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-# Ignore coverage directory
-coverage/
-# Ignore temporary files
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
 .env*.local
-*.tmp
-.env/
+
+# typescript
+*.tsbuildinfo
+
+app-example
+
+# generated native folders
+/ios
+/android

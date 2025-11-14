@@ -1,7 +1,5 @@
 import fs from "fs";
 import path from "path";
-const intentsPath = path.join(__dirname, "../intents/universalIntents.json");
-const intentsData = JSON.parse(fs.readFileSync(intentsPath, "utf-8"));
 
 export interface IntentDef {
   intent: string;
@@ -19,11 +17,20 @@ export interface DomainIntents {
 export function loadAllIntents(intentsDir?: string): DomainIntents[] {
   const dir = intentsDir || path.join(__dirname, "../intents");
   const files = fs.readdirSync(dir).filter(f => f.endsWith(".json"));
+
   const all: DomainIntents[] = [];
 
   for (const file of files) {
-    const raw = fs.readFileSync(path.join(dir, file), "utf8");
-    const parsed = JSON.parse(raw) as DomainIntents;
+    const filePath = path.join(dir, file);
+    const raw = fs.readFileSync(filePath, "utf8");
+    const parsed = JSON.parse(raw);
+
+    // Validate JSON structure
+    if (!parsed.domain || !Array.isArray(parsed.intents)) {
+      console.error(`❌ Invalid intent file: ${file}`);
+      continue;
+    }
+
     all.push(parsed);
   }
 

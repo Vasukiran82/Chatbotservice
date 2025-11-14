@@ -5,14 +5,31 @@
       "intent": "leave_balance",
       "patterns": ["show leave balance", "how many leaves left", "leave balance"],
       "validationAPI": "/api/erp/validateLeave",
-      "responses": ["You have {remaining_leaves} leave days remaining."]
+      "responses": ["You have {remaining_leaves} leaves remaining."]
     },
     {
       "intent": "invoice_status",
-      "patterns": ["invoice status {invoice_id}", "status of invoice {invoice_id}", "when is invoice {invoice_id} due"],
+      "patterns": [
+        "invoice status {invoice_id}",
+        "status of invoice {invoice_id}",
+        "invoice {invoice_id} details"
+      ],
       "entities": ["invoice_id"],
-      "validationAPI": "/api/erp/validateInvoice",
+      "validationAPI": "/api/erp/invoiceStatus",
       "responses": ["Invoice {invoice_id} is {status} and due on {due_date}."]
+    },
+    {
+      "intent": "attendance_status",
+      "patterns": ["attendance for this month", "show my attendance", "check my attendance"],
+      "validationAPI": "/api/erp/attendanceStatus",
+      "responses": ["You were present {days_present} days and absent {days_absent} days."]
+    },
+    {
+      "intent": "salary_details",
+      "patterns": ["salary details", "salary for {month}", "show my payslip"],
+      "entities": ["month"],
+      "validationAPI": "/api/erp/salaryDetails",
+      "responses": ["Salary for {month} is {amount}."]
     }
   ]
 }

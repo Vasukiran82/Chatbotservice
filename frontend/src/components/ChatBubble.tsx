@@ -1,35 +1,58 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 
-interface ChatBubbleProps {
-  message: string;
-  isUser: boolean;
+interface Props {
+  from: "user" | "bot";
+  text: string;
 }
 
-const ChatBubble: React.FC<ChatBubbleProps> = ({ message, isUser }) => (
-  <View style={[styles.container, isUser ? styles.user : styles.bot]}>
-    <Text style={styles.text}>{message}</Text>
+export const ChatBubble: React.FC<Props> = ({ from, text }) => (
+  <View
+    style={[
+      styles.bubble,
+      from === "user" ? styles.userBubble : styles.botBubble,
+    ]}
+  >
+    <Text
+      style={[
+        styles.text,
+        from === "user" ? styles.userText : styles.botText,
+      ]}
+    >
+      {text}
+    </Text>
   </View>
 );
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 10,
-    maxWidth: '80%',
+  bubble: {
+    maxWidth: "78%",
+    padding: 12,
+    borderRadius: 16,
+    marginVertical: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
-  user: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#DCF8C6',
-  },
-  bot: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#E5E5EA',
-  },
-  text: {
-    fontSize: 16,
-  },
-});
 
-export default ChatBubble;
+  userBubble: {
+    alignSelf: "flex-end",
+    backgroundColor: "#007AFF",
+    borderBottomRightRadius: 4,
+  },
+
+  botBubble: {
+    alignSelf: "flex-start",
+    backgroundColor: "#FFFFFF",
+    borderBottomLeftRadius: 4,
+    borderWidth: 0.5,
+    borderColor: "#ddd",
+  },
+
+  userText: { color: "#fff", fontSize: 16 },
+  botText: { color: "#222", fontSize: 16 },
+
+  text: { fontSize: 16 },
+});

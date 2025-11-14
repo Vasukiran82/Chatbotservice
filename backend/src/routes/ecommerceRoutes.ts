@@ -1,22 +1,18 @@
 import express from "express";
-import {
-  getAllOrdersCtrl,
-  getOrderByIdCtrl,
-  createOrderCtrl,
-  updateOrderCtrl,
-  deleteOrderCtrl,
-  getOffersCtrl,
-  getCategoriesCtrl
-} from "../controllers/ecommerceController";
-
 const router = express.Router();
 
-router.get("/orders", getAllOrdersCtrl);
-router.get("/orders/:id", getOrderByIdCtrl);
-router.post("/orders", createOrderCtrl);
-router.put("/orders/:id", updateOrderCtrl);
-router.delete("/orders/:id", deleteOrderCtrl);
-router.get("/offers", getOffersCtrl);
-router.get("/categories", getCategoriesCtrl);
+router.get("/orders/:orderId", (req, res) => {
+  const { orderId } = req.params;
+
+  if (orderId === "12345") {
+    return res.json({
+      orderId,
+      status: "shipped",
+      expectedDelivery: "2025-11-20"
+    });
+  }
+
+  res.status(404).json({ message: "Order not found" });
+});
 
 export default router;

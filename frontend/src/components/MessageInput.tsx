@@ -1,46 +1,35 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import { View, TextInput, Button, StyleSheet } from "react-native";
 
-interface Props {
-  onSend: (text: string) => void;
-}
-
-const MessageInput: React.FC<Props> = ({ onSend }) => {
-  const [text, setText] = useState('');
-
-  const handleSend = () => {
-    if (text.trim()) {
-      onSend(text);
-      setText('');
-    }
-  };
-
+export const MessageInput = ({ onSend }: { onSend: (text: string) => void }) => {
+  const [text, setText] = useState("");
   return (
     <View style={styles.container}>
       <TextInput
+        style={styles.input}
+        placeholder="Type your message..."
         value={text}
         onChangeText={setText}
-        placeholder="Type a message..."
-        style={styles.input}
       />
-      <Button title="Send" onPress={handleSend} />
+      <Button
+        title="Send"
+        onPress={() => {
+          onSend(text);
+          setText("");
+        }}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    padding: 8,
-  },
+  container: { flexDirection: "row", padding: 10, alignItems: "center" },
   input: {
     flex: 1,
-    borderColor: '#ccc',
     borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 8,
     marginRight: 8,
-    borderRadius: 8,
-    paddingHorizontal: 10,
   },
 });
-
-export default MessageInput;

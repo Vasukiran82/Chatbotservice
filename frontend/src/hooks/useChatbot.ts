@@ -1,28 +1,27 @@
-import { useState } from 'react';
-import { sendMessageToBot } from '../api/chatbotAPI';
-import { ChatMessage } from '../types/chatbot';
+import { useState } from "react";
+import { sendMessageToBot } from "../api/chatbotApi";
 
-export const useChatbot = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export function useChatbot() {
+  const [messages, setMessages] = useState<{ from: string; text: string }[]>([]);
   const [loading, setLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string>();
 
   const sendMessage = async (text: string) => {
-    const userMessage: ChatMessage = { sender: 'user', text };
-    setMessages(prev => [...prev, userMessage]);
+    if (!text.trim()) return;
+    setMessages(prev => [...prev, { from: "user", text }]);
     setLoading(true);
 
     try {
-      const botReply = await sendMessageToBot(text);
-      setMessages(prev => [...prev, botReply]);
-    } catch (error) {
-      setMessages(prev => [
-        ...prev,
-        { sender: 'bot', text: 'Error: Could not connect to server.' },
-      ]);
+      const res = await sendMessageToBot(text, sessionId);
+      setSessionId(res.sessionId);
+      setMessages(prev => [...prev, { from: "bot", text: res.reply }]);
+    } catch (err) {
+      console.error(err);
+      setMessages(prev => [...prev, { from: "bot", text: "⚠️ Error contacting bot." }]);
     } finally {
       setLoading(false);
     }
   };
 
-  return { messages, loading, sendMessage };
-};
+  return { messages, sendMessage, loading };
+}

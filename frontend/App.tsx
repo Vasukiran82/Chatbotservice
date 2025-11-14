@@ -1,6 +1,11 @@
-import React from 'react';
-import ChatScreen from './src/screens/chatscreen';
+import React from "react";
+import { SafeAreaView } from "react-native";
+import { ChatScreen } from "./src/screens/ChatScreen";
 
 export default function App() {
-  return <ChatScreen />;
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <ChatScreen />
+    </SafeAreaView>
+  );
 }

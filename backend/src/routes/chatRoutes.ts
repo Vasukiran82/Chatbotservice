@@ -1,56 +1,93 @@
 import express, { Request, Response } from "express";
 import { matchIntent } from "../utils/intentMatcher";
-import { validate } from "../utils/validator";
-import { buildResponse } from "../utils/responseBuilder";
 import { loadAllIntents } from "../utils/intentLoader";
+import axios from "axios";
+import { buildResponse } from "../utils/responseBuilder";
 
 const router = express.Router();
+const ECOM_API = "http://localhost:5001/api/ecommerce";
+
+// Load intents once (performance improvement)
+const ALL_INTENTS = loadAllIntents();
 
 router.post("/chat", async (req: Request, res: Response) => {
   const message = String(req.body?.message || "").trim();
-  const session = (req as any).session;
-  if (!message) return res.status(400).json({ error: "message is required" });
+  const sessionId = req.body?.sessionId || Date.now().toString();
 
-  
+  if (!message)
+    return res.status(400).json({ reply: "Message is required" });
+
   const matched = matchIntent(message);
+
+  // ❗ No intent found → fallback
   if (!matched.intent || matched.confidence <= 0) {
-    const all = loadAllIntents();
-    const common = all.find(d => d.domain === "common");
-    const fallback = common?.intents.find(i => i.intent === "fallback");
-    const reply = fallback ? fallback.responses[0] : "Sorry, I didn't understand.";
-    session.history.push({ from: "user", text: message, ts: Date.now() });
-    session.history.push({ from: "bot", text: reply, ts: Date.now() });
-    return res.json({ domain: "common", intent: "fallback", reply, sessionId: session.id });
+    const fallback =
+      ALL_INTENTS.find(d => d.domain === "common")
+        ?.intents.find(i => i.intent === "fallback");
+
+    return res.json({
+      reply: fallback?.responses?.[0] || "Sorry, I didn't understand that.",
+      sessionId,
+    });
   }
 
-  // 3. dynamic validation if intent specifies it
-  const domain = matched.domain;
-  const intentName = matched.intent.intent;
-  const entities = matched.entities || {};
-  let validatedData: Record<string, any> = {};
+  const { domain, intent, entities } = matched;
+  let reply = "";
 
   try {
-    const validationResult = await validate(domain, intentName, entities);
-    if (validationResult?.ok) validatedData = validationResult.data || {};
+    if (domain === "ecommerce") {
+      switch (intent.intent) {
+        case "get_offers": {
+          const { data } = await axios.get(`${ECOM_API}/offers`);
+          reply = `Here are our current offers:\n${data
+            .map((o: any) => `• ${o.title}`)
+            .join("\n")}`;
+          break;
+        }
+
+        case "get_categories": {
+          const { data } = await axios.get(`${ECOM_API}/categories`);
+          reply = `Available categories:\n${data
+            .map((c: string) => `• ${c}`)
+            .join("\n")}`;
+          break;
+        }
+
+        case "get_orders": {
+          const { data } = await axios.get(`${ECOM_API}/orders`);
+          reply = `Recent orders:\n${data
+            .map((o: any) => `#${o.id} - ${o.customer} - ₹${o.total}`)
+            .join("\n")}`;
+          break;
+        }
+
+        case "track_order": {
+          const id = entities?.order_id;
+          if (!id) {
+            reply = "Please provide an order ID like ORD001.";
+            break;
+          }
+
+          const { data } = await axios.get(`${ECOM_API}/orders/${id}`);
+          reply = `Order #${id} → Status: ${data.status}`;
+          break;
+        }
+
+        default:
+          reply = "I understand the intent, but action is not implemented yet.";
+      }
+    } else {
+      reply = buildResponse(intent.responses?.[0] || "OK.", entities);
+    }
+
+    return res.json({ reply, sessionId });
+
   } catch (err) {
-    console.error("Validation error:", err);
+    console.error("CHAT ERROR:", err);
+    return res
+      .status(500)
+      .json({ reply: "⚠️ Error contacting backend API." });
   }
-
-  // 4. build response template (first template)
-  const template = matched.intent.responses && matched.intent.responses[0]
-    ? matched.intent.responses[0]
-    : "Okay.";
-
-  // merge entity values into validatedData so placeholders can be filled
-  const mergedData = { ...entities, ...validatedData };
-  const reply = buildResponse(template, mergedData);
-
-  // 5. Save history in session
-  session.history.push({ from: "user", text: message, ts: Date.now() });
-  session.history.push({ from: "bot", text: reply, ts: Date.now() });
-
-  // 6. Return response
-  return res.json({ domain, intent: intentName, reply, sessionId: session.id, entities: mergedData });
 });
 
 export default router;
