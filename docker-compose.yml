@@ -1,0 +1,35 @@
+services:
+  backend:
+    build: ./backend
+    container_name: chatbot-backend
+    restart: always
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    container_name: chatbot-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: chatbot-mongo-express
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_PORT: 27017
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongodb
+
+volumes:
+  mongo-data:

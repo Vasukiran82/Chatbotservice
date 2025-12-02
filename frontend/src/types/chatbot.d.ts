@@ -1,4 +1,1 @@
-export interface ChatMessage {
-  sender: 'user' | 'bot';
-  text: string;
-}
+export type Message = { from: "user" | "bot"; text: string; ts?: number };

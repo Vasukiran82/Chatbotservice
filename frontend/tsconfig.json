@@ -11,14 +11,18 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["react", "react-native"],
+    "types": [
+      "react",
+      "react-native"
+    ],
     "isolatedModules": true,
-    "lib": ["dom", "esnext"]
+    "lib": [
+      "dom",
+      "esnext"
+    ]
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "**/*.tsx"
   ]
 }

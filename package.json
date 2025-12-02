@@ -1,0 +1,15 @@
+{
+  "name": "chatbot-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && npm run dev",
+    "start:frontend": "cd frontend && npx expo start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "docker:up": "docker-compose up --build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

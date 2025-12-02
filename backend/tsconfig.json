@@ -1,13 +1,63 @@
+// tsconfig.json
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "rootDir": "src",
+    /* Language and Environment */
+    "target": "ES2022",                    // Modern JS features (nullish coalescing, optional chaining, etc.)
+    "lib": ["ES2022"],                     // Include latest standard library
+
+    /* Modules */
+    "module": "Node16",                    // Important: use Node.js 16+ module resolution (supports package.json "type" and "exports")
+    "moduleResolution": "Node16",          // Required when using "Node16" or "NodeNext"
+
+    /* Emit */
     "outDir": "dist",
-    "strict": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true
+    "rootDir": "src",
+    "removeComments": true,
+    "sourceMap": true,
+    "inlineSourceMap": false,
+
+    /* Interop & Compatibility */
+    "esModuleInterop": true,               // Proper default imports for CommonJS (e.g. import mongoose from "mongoose")
+    "allowSyntheticDefaultImports": true,  // Helps with tree-shaking
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,                        // Enables all strict type-checking options
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Completeness */
+    "skipLibCheck": true,                  // Faster builds (safe with modern libs)
+    "resolveJsonModule": true,             // Allow importing .json files (useful for config)
+
+    /* Node.js specific */
+    "allowJs": false,
+    "noEmit": false,
+    "isolatedModules": true                // Required for some bundlers / Babel / esbuild
+
+    // Uncomment if you want to use "type": "module" in package.json (full ESM)
+    // "module": "NodeNext",
+    // "moduleResolution": "NodeNext"
   },
-  "include": ["src"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "ts-node": {
+    "transpileOnly": true,                 // Faster dev server with ts-node-dev / nodemon
+    "files": true
+  }
 }

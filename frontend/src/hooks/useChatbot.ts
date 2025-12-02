@@ -1,27 +1,56 @@
-import { useState } from "react";
-import { sendMessageToBot } from "../api/chatbotApi";
+// hooks/useChatbot.ts
+import { useState, useCallback } from 'react';
+import { sendMessageToBot } from '../api/chatbotApi';
 
-export function useChatbot() {
-  const [messages, setMessages] = useState<{ from: string; text: string }[]>([]);
+export const useChatbot = () => {
+  const [messages, setMessages] = useState<Array<{text: string, isUser: boolean}>>([]);
   const [loading, setLoading] = useState(false);
-  const [sessionId, setSessionId] = useState<string>();
+  const [sessionId, setSessionId] = useState<string>('');
 
-  const sendMessage = async (text: string) => {
-    if (!text.trim()) return;
-    setMessages(prev => [...prev, { from: "user", text }]);
+  const sendMessage = useCallback(async (message: string) => {
+    if (!message.trim()) return;
+
+    // Add user message
+    setMessages(prev => [...prev, { text: message, isUser: true }]);
     setLoading(true);
 
     try {
-      const res = await sendMessageToBot(text, sessionId);
-      setSessionId(res.sessionId);
-      setMessages(prev => [...prev, { from: "bot", text: res.reply }]);
-    } catch (err) {
-      console.error(err);
-      setMessages(prev => [...prev, { from: "bot", text: "⚠️ Error contacting bot." }]);
+      // Send to backend
+      const response = await sendMessageToBot(message, sessionId);
+      
+      // Update session ID if provided
+      if (response.sessionId) {
+        setSessionId(response.sessionId);
+      }
+
+      // Add bot response
+      setMessages(prev => [...prev, { 
+        text: response.reply, 
+        isUser: false 
+      }]);
+
+    } catch (error: any) {
+      // Add error message
+      setMessages(prev => [...prev, { 
+        text: "Sorry, I'm having trouble responding right now. Please try again.", 
+        isUser: false 
+      }]);
+      console.error('Chat error:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [sessionId]);
 
-  return { messages, sendMessage, loading };
-}
+  const clearChat = useCallback(() => {
+    setMessages([]);
+    setSessionId('');
+  }, []);
+
+  return {
+    messages,
+    loading,
+    sendMessage,
+    clearChat,
+    sessionId
+  };
+};

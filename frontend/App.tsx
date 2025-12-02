@@ -1,11 +1,14 @@
+// App.tsx
 import React from "react";
-import { SafeAreaView } from "react-native";
-import { ChatScreen } from "./src/screens/ChatScreen";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import ChatScreen from "./src/components/ChatScreen";
 
 export default function App() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaProvider>
+      <StatusBar style="dark" />
       <ChatScreen />
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
