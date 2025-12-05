@@ -53,16 +53,80 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  messageBubble: { maxWidth: '80%', padding: 12, borderRadius: 16, marginVertical: 4 },
-  userBubble: { alignSelf: 'flex-end', backgroundColor: '#007AFF' },
-  botBubble: { alignSelf: 'flex-start', backgroundColor: '#FFFFFF' },
-  messageText: { fontSize: 16 },
-  userText: { color: '#FFFFFF' },
-  botText: { color: '#000000' },
-  inputContainer: { flexDirection: 'row', padding: 16, backgroundColor: '#FFFFFF', alignItems: 'flex-end' },
-  textInput: { flex: 1, borderWidth: 1, borderColor: '#DDD', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8, marginRight: 8, maxHeight: 100, fontSize: 16 },
-  sendButton: { backgroundColor: '#007AFF', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-  sendButtonDisabled: { backgroundColor: '#CCC' },
-  sendButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  container: {
+    flex: 1,
+    backgroundColor: '#F0F2F5'
+  },
+  messageBubble: {
+    maxWidth: '75%',
+    minWidth: 60,
+    padding: 14,
+    borderRadius: 18,
+    marginVertical: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  userBubble: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#007AFF',
+    borderBottomRightRadius: 4,
+  },
+  botBubble: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#E8E8E8',
+    borderBottomLeftRadius: 4,
+  },
+  messageText: {
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  userText: {
+    color: '#FFFFFF',
+    fontWeight: '500',
+  },
+  botText: {
+    color: '#1C1C1E',
+    fontWeight: '500',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    padding: 16,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'flex-end',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5EA',
+  },
+  textInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#D1D1D6',
+    borderRadius: 22,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    marginRight: 10,
+    maxHeight: 100,
+    fontSize: 16,
+    backgroundColor: '#F9F9F9',
+  },
+  sendButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: 70,
+  },
+  sendButtonDisabled: {
+    backgroundColor: '#C7C7CC',
+    opacity: 0.6,
+  },
+  sendButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
 });

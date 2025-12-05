@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ShopBot",
-    "slug": "shopbot",
+    "name": "ChatBot",
+    "slug": "Chatbot",
     "version": "1.0.0",
     "extra": {
       "apiUrl": "http://192.168.1.100:5001"
