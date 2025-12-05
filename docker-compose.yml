@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   backend:
     build: ./backend
@@ -9,6 +11,17 @@ services:
       - "5001:5001"
     depends_on:
       - mongodb
+
+  frontend:
+    build: ./frontend
+    container_name: chatbot-frontend
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:5001/api
+    depends_on:
+      - backend
 
   mongodb:
     image: mongo:latest
@@ -27,7 +40,7 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongodb
       ME_CONFIG_MONGODB_PORT: 27017
     ports:
-      - "8081:8081"
+      - "8082:8081"
     depends_on:
       - mongodb
 

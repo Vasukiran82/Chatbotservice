@@ -4,6 +4,9 @@ import cors from "cors";
 import { config } from "./config";
 import { logger } from "./utils/logger";
 import chatRoutes from "./routes/chatRoutes";
+import chatbotDataRoutes from "./routes/chatbotDataRoutes";
+
+
 
 const app = express();
 
@@ -41,6 +44,8 @@ app.get("/health", (_req: Request, res: Response) => {
 
 // API Routes
 app.use("/api/chat", chatRoutes);
+app.use("/api/chatbot", chatbotDataRoutes);
+
 
 // 404 Handler
 app.use("*", (_req: Request, res: Response) => {

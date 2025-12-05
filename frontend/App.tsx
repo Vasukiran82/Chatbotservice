@@ -2,7 +2,7 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import ChatScreen from "./src/components/ChatScreen";
+import ChatScreen from "./src/screens/ChatScreen";
 
 export default function App() {
   return (

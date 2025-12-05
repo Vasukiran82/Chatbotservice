@@ -1,82 +1,99 @@
 // src/engine/IntentClassifier.ts
-import fs from "fs";
-import path from "path";
-import Fuse from "fuse.js";
-import type { ExecutableIntent } from "../types/intent";
+import { ChatbotDataService } from "../services/ChatbotDataService";
+import { logger } from "../utils/logger";
+import { IChatbotIntent } from "../models/ChatbotIntent";
 
-const intentDir = path.join(__dirname, "../models/intents");
-const intentFiles = fs.readdirSync(intentDir).filter(f => f.endsWith(".intent.ts"));
+// Import intent executors (we'll keep the execute logic separate)
+import greetingIntent from "../models/intents/greeting.intent";
+import farewellIntent from "../models/intents/farewell.intent";
+import trackOrderIntent from "../models/intents/trackOrder.intent";
+import cancelOrderIntent from "../models/intents/cancelOrder.intent";
+import thanksIntent from "../models/intents/thanks.intent";
+import complaintIntent from "../models/intents/complaint.intent";
+import fallbackIntent from "../models/intents/fallback.intent";
 
-const intents: ExecutableIntent[] = intentFiles.map(file => {
-  const filePath = path.join(intentDir, file);
-  const module = require(filePath);
-  return module.default as ExecutableIntent;
-});
-
-// Configure Fuse.js
-const fuseOptions = {
-  includeScore: true,
-  keys: [
-    { name: "keywords", weight: 0.7 },
-    { name: "boostWords", weight: 0.3 }
-  ],
-  threshold: 0.6, // 0.0 = perfect match, 1.0 = match anything
-  ignoreLocation: true,
+// Map of intent executors
+const intentExecutors: Record<string, any> = {
+  greeting: greetingIntent,
+  farewell: farewellIntent,
+  trackOrder: trackOrderIntent,
+  cancelOrder: cancelOrderIntent,
+  thanks: thanksIntent,
+  complaint: complaintIntent,
+  fallback: fallbackIntent,
 };
-
-const fuse = new Fuse(intents, fuseOptions);
 
 export const classifyAndExecuteIntent = async (
   message: string,
   entities: any,
   sessionId: string
 ) => {
-  // 1. Exact/Fuzzy Match using Fuse.js
-  const results = fuse.search(message);
+  try {
+    // 1. Get Fuse instance from service (loads from DB if needed)
+    const fuse = await ChatbotDataService.getIntentFuse();
 
-  let bestIntent: ExecutableIntent | null = null;
-  let confidence = 0;
+    // 2. Fuzzy match using Fuse.js
+    const results = fuse.search(message);
 
-  if (results.length > 0) {
-    const topMatch = results[0];
-    // Fuse score is 0 (perfect) to 1 (bad). Invert it for confidence.
-    // confidence = 1 - score
-    const score = topMatch.score || 1;
-    confidence = 1 - score;
+    let bestIntent: IChatbotIntent | null = null;
+    let confidence = 0;
 
-    // Check min confidence
-    if (confidence >= (topMatch.item.minConfidence || 0.4)) {
-      bestIntent = topMatch.item;
+    if (results.length > 0) {
+      const topMatch = results[0];
+      // Fuse score is 0 (perfect) to 1 (bad). Invert it for confidence.
+      const score = topMatch.score || 1;
+      confidence = 1 - score;
+
+      // Check min confidence
+      if (confidence >= (topMatch.item.minConfidence || 0.4)) {
+        bestIntent = topMatch.item;
+      }
     }
-  }
 
-  // 2. Fallback if no good match
-  if (!bestIntent) {
-    // Try to find a fallback intent explicitly
-    bestIntent = intents.find(i => i.name === "fallback") || null;
-    confidence = 0.1;
-  }
+    // 3. Fallback if no good match
+    if (!bestIntent) {
+      // Try to find a fallback intent
+      const intents = await ChatbotDataService.getIntents();
+      bestIntent = intents.find((i) => i.name === "fallback") || null;
+      confidence = 0.1;
+    }
 
-  if (!bestIntent) {
+    if (!bestIntent) {
+      return {
+        intent: "unknown",
+        confidence: 0.0,
+        response: "I'm not sure what you mean. Can you try saying it differently?",
+      };
+    }
+
+    // 4. Execute intent
+    let response: string;
+    try {
+      const executor = intentExecutors[bestIntent.name];
+
+      if (executor && typeof executor.execute === "function") {
+        // Use the executor's execute function
+        response = await executor.execute(message, entities, sessionId);
+      } else {
+        // Fallback to getting a random response from the database
+        response = await ChatbotDataService.getRandomResponse(bestIntent.name);
+      }
+    } catch (err) {
+      logger.error({ error: err, intent: bestIntent.name }, "Intent execution error");
+      response = "Something went wrong. Please try again.";
+    }
+
     return {
-      intent: "unknown",
+      intent: bestIntent.name,
+      confidence: Number(confidence.toFixed(3)),
+      response,
+    };
+  } catch (error) {
+    logger.error({ error }, "Error in classifyAndExecuteIntent");
+    return {
+      intent: "error",
       confidence: 0.0,
-      response: "I'm not sure what you mean. Can you try saying it differently?",
+      response: "I'm having trouble processing your request. Please try again.",
     };
   }
-
-  // 3. Execute
-  let response: string;
-  try {
-    response = await bestIntent.execute(message, entities, sessionId);
-  } catch (err) {
-    console.error("Intent execution error:", err);
-    response = "Something went wrong. Please try again.";
-  }
-
-  return {
-    intent: bestIntent.name,
-    confidence: Number(confidence.toFixed(3)),
-    response,
-  };
 };

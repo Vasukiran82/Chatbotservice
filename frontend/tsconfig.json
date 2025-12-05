@@ -13,7 +13,8 @@
     "allowSyntheticDefaultImports": true,
     "types": [
       "react",
-      "react-native"
+      "react-native",
+      "node"         // ✅ add this
     ],
     "isolatedModules": true,
     "lib": [
