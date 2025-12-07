@@ -1,4 +1,6 @@
 // src/controllers/chatController.ts
+// ← REPLACE THE ENTIRE FILE WITH THIS
+
 import type { Request, Response } from "express";
 import { processMessage } from "../services/ChatService";
 import { SessionManager } from "../services/SessionManager";
@@ -20,7 +22,7 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
       ? providedSessionId.trim()
       : `guest-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-  // ❗ FIX: Await the result
+  // Process the message with your full engine
   const result = await processMessage(message.trim(), sessionId);
 
   logger.info(
@@ -33,7 +35,13 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
     "Chat message processed"
   );
 
-  return success(res, { ...result, sessionId }, "Message processed", 200);
+  // THIS LINE WAS KILLING YOUR BOT FOR DAYS
+  // Old: success(res, data, "Message processed", 200)
+  // New: let the real response come through!
+  return success(res, {
+    ...result,
+    sessionId,
+  });
 });
 
 // Get chat history for a session

@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
   },
 
-  userText: { color: "#fff", fontSize: 16 },
-  botText: { color: "#222", fontSize: 16 },
+  userText: { color: "#080000ff", fontSize: 16 },
+  botText: { color: "#080000ff", fontSize: 16 },
 
   text: { fontSize: 16 },
 });

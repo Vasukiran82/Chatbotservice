@@ -1,1 +1,1 @@
-export type Message = { from: "user" | "bot"; text: string; ts?: number };
+// export type Message = { from: "user" | "bot"; text: string; ts?: number };

@@ -1,5 +1,5 @@
-// src/app.ts
 import express, { Request, Response, NextFunction } from "express";
+import path from "path";
 import cors from "cors";
 import { config } from "./config";
 import { logger } from "./utils/logger";
@@ -45,6 +45,17 @@ app.get("/health", (_req: Request, res: Response) => {
 // API Routes
 app.use("/api/chat", chatRoutes);
 app.use("/api/chatbot", chatbotDataRoutes);
+
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, "../../frontend/dist")));
+
+// Handle client-side routing (SPA) - Must be after API routes
+app.get("*", (req: Request, res: Response, next: NextFunction) => {
+  if (req.originalUrl.startsWith("/api")) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+});
 
 
 // 404 Handler
