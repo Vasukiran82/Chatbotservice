@@ -7,7 +7,7 @@ import { sendMessageToBot } from '../api/chatbotApi';
 type ApiResponse = any;
 
 export const useChatbot = () => {
-  const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean }>>([]);
+  const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean; timestamp: Date }>>([]);
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>('');
 
@@ -15,7 +15,7 @@ export const useChatbot = () => {
     const text = userInput.trim();
     if (!text) return;
 
-    setMessages(prev => [...prev, { text, isUser: true }]);
+    setMessages(prev => [...prev, { text, isUser: true, timestamp: new Date() }]);
     setLoading(true);
 
     try {
@@ -34,12 +34,13 @@ export const useChatbot = () => {
         setSessionId(response.sessionId);
       }
 
-      setMessages(prev => [...prev, { text: botReply, isUser: false }]);
+      setMessages(prev => [...prev, { text: botReply, isUser: false, timestamp: new Date() }]);
 
     } catch (error) {
       setMessages(prev => [...prev, {
         text: 'Connection failed. Try again.',
-        isUser: false
+        isUser: false,
+        timestamp: new Date()
       }]);
     } finally {
       setLoading(false);
