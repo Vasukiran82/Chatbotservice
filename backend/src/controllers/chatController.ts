@@ -35,13 +35,12 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
     "Chat message processed"
   );
 
-  // THIS LINE WAS KILLING YOUR BOT FOR DAYS
-  // Old: success(res, data, "Message processed", 200)
-  // New: let the real response come through!
+  // Return success with the actual reply as the message property for extra safety
+  // The data object also contains result.reply
   return success(res, {
     ...result,
     sessionId,
-  });
+  }, result.reply || "Message processed");
 });
 
 // Get chat history for a session

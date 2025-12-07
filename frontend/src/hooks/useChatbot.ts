@@ -22,7 +22,13 @@ export const useChatbot = () => {
       const response: ApiResponse = await sendMessageToBot(text, sessionId);
 
       // This works no matter what field name your backend uses
-      const botReply = response.message || response.reply || response.text || 'Message processed';
+      // Prioritize structured data, then fallback to message
+      const botReply =
+        response.data?.reply ||
+        response.data?.response ||
+        response.reply ||
+        response.message ||
+        'Message processed';
 
       if (response.sessionId) {
         setSessionId(response.sessionId);
@@ -31,9 +37,9 @@ export const useChatbot = () => {
       setMessages(prev => [...prev, { text: botReply, isUser: false }]);
 
     } catch (error) {
-      setMessages(prev => [...prev, { 
-        text: 'Connection failed. Try again.', 
-        isUser: false 
+      setMessages(prev => [...prev, {
+        text: 'Connection failed. Try again.',
+        isUser: false
       }]);
     } finally {
       setLoading(false);

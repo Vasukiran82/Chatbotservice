@@ -5,23 +5,13 @@ import { logger } from "../utils/logger";
 import { IChatbotIntent } from "../models/ChatbotIntent";
 
 // Import intent executors
-import greetingIntent from "../models/intents/greeting.intent";
-import farewellIntent from "../models/intents/farewell.intent";
 import trackOrderIntent from "../models/intents/trackOrder.intent";
 import cancelOrderIntent from "../models/intents/cancelOrder.intent";
-import thanksIntent from "../models/intents/thanks.intent";
-import complaintIntent from "../models/intents/complaint.intent";
-import fallbackIntent from "../models/intents/fallback.intent";
 
 // All executor modules
 const intentExecutors: Record<string, any> = {
-  greeting: greetingIntent,
-  farewell: farewellIntent,
   trackOrder: trackOrderIntent,
   cancelOrder: cancelOrderIntent,
-  thanks: thanksIntent,
-  complaint: complaintIntent,
-  fallback: fallbackIntent,
 };
 
 // Utility to pick random response
@@ -46,9 +36,11 @@ export const classifyAndExecuteIntent = async (
     // ---------------------------
     if (results.length > 0) {
       const top = results[0];
+      // Fuse score: 0 is perfect match, 1 is no match
       const score = top.score ?? 1;
       confidence = 1 - score;
 
+      // Configurable threshold check
       if (confidence >= (top.item.minConfidence ?? 0.4)) {
         bestIntent = top.item;
       }
@@ -63,43 +55,67 @@ export const classifyAndExecuteIntent = async (
       confidence = 0.1; // very low
     }
 
-    // ---------------------------
-    // 3️⃣ EXECUTE INTENT HANDLER
-    // ---------------------------
-    let response: string;
+    if (!bestIntent) {
+      logger.warn("No fallback intent found in DB. using safe default.");
+      return {
+        intent: "fallback",
+        confidence: 0,
+        response: "I didn't quite get that. Could you try rephrasing?",
+        reply: "I didn't quite get that. Could you try rephrasing?", // Compatible field
+      };
+    }
 
-    const executor = bestIntent ? intentExecutors[bestIntent.name] : null;
+    // ---------------------------
+    // 3️⃣ EXECUTE INTENT HANDLER OR DB RESPONSE
+    // ---------------------------
+    let response: string | null = null;
+    const intentName = bestIntent.name;
 
-    if (bestIntent && executor?.execute) {
+    // A. Check for Code Executor
+    const executor = intentExecutors[intentName];
+
+    if (executor?.execute) {
       try {
         response = await executor.execute(message, entities, sessionId);
       } catch (err) {
-        logger.error(err, "Intent executor crashed");
-
-        // graceful fallback
-        response = `I understood your intent was: "${bestIntent.name}".`;
+        logger.error({ err, intent: intentName }, "Intent executor crashed");
+        // Don't return yet, fall back to DB response
+        response = null;
       }
-    } else {
-      // ---------------------------------------------
-      // 4️⃣ FINAL HUMAN-LIKE FALLBACK (ALWAYS RETURNS)
-      // ---------------------------------------------
+    }
+
+    // B. If no code response, check DB ChatbotResponse
+    if (!response) {
+      try {
+        // This handles "If field is 'replies' (array) → pick random one"
+        const dbResponses = await ChatbotDataService.getResponseForIntent(intentName);
+        if (dbResponses && dbResponses.length > 0 && dbResponses[0] !== "I'm not sure how to respond to that.") {
+          response = randomReply(dbResponses);
+        }
+      } catch (dbErr) {
+        logger.error({ dbErr, intent: intentName }, "DB response fetch failed");
+      }
+    }
+
+    // C. Final Fallback if everything failed
+    if (!response) {
       response = randomReply([
         "Hi there! How can I assist you today?",
         "I'm here and ready to help—what would you like to know?",
         "Hmm… I couldn’t understand that. Could you try saying it differently?",
         "Still learning! You can ask me about orders, refunds, cancellations, or just say 'hi'!",
-        `You said: "${message}" — I'm still learning how to respond to that.`,
-        "Hello! Feel free to ask me anything.",
+        `You said: "${message}" — I'm still learning how to respond to that.`
       ]);
     }
 
     // ---------------------------------
-    // 5️⃣ Always return a proper payload
+    // 5️⃣ Always return text in 'response' AND 'reply'
     // ---------------------------------
     return {
-      intent: bestIntent?.name || "fallback",
+      intent: intentName,
       confidence: Number(confidence.toFixed(3)),
-      response,
+      response: response,
+      reply: response, // The user specifically requested mapping to 'reply' or 'Reply'
     };
 
   } catch (error) {
@@ -109,6 +125,7 @@ export const classifyAndExecuteIntent = async (
       intent: "error",
       confidence: 0,
       response: "Oops! Something broke for a moment. Please try again!",
+      reply: "Oops! Something broke for a moment. Please try again!",
     };
   }
 };
